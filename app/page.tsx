@@ -1,11 +1,15 @@
 import Link from 'next/link'
 
 async function getRecipes() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
-  const res = await fetch(`${baseUrl}/api/recipes`, {
-    cache: 'no-store',
-  })
-  if (!res.ok) return []
+  const baseUrl = process.env.VERCEL_URL 
+    ? `https://${process.env.VERCEL_URL}` 
+    : 'http://localhost:3000'
+  
+  const res = await fetch(`${baseUrl}/api/recipes`, { cache: 'no-store' })
+  if (!res.ok) {
+    console.error('Failed to fetch recipes:', res.status)
+    return []
+  }
   return res.json()
 }
 
