@@ -8,10 +8,7 @@ export async function POST(request: NextRequest) {
     const oldUrl = formData.get('oldUrl') as string | null
 
     if (!file) {
-      return NextResponse.json(
-        { error: 'No file provided' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
 
     // 기존 이미지 삭제
@@ -27,15 +24,12 @@ export async function POST(request: NextRequest) {
     // 새 이미지 업로드 (랜덤 파일명 사용)
     const blob = await put(file.name, file, {
       access: 'public',
-      addRandomSuffix: true,  // 이 줄 추가!
+      addRandomSuffix: true, // 이 줄 추가!
     })
 
     return NextResponse.json({ url: blob.url })
   } catch (error) {
     console.error('Upload error:', error)
-    return NextResponse.json(
-      { error: 'Upload failed' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Upload failed' }, { status: 500 })
   }
 }

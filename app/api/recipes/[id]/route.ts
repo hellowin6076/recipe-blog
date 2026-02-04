@@ -2,51 +2,39 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
 // GET /api/recipes/[id] - 레시피 상세 조회
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    
+
     const recipe = await prisma.recipe.findUnique({
       where: { id },
       include: {
         ingredients: {
-          orderBy: { order: 'asc' }
+          orderBy: { order: 'asc' },
         },
         steps: {
-          orderBy: { order: 'asc' }
+          orderBy: { order: 'asc' },
         },
         tags: {
           include: {
-            tag: true
-          }
-        }
-      }
+            tag: true,
+          },
+        },
+      },
     })
 
     if (!recipe) {
-      return NextResponse.json(
-        { error: 'Recipe not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Recipe not found' }, { status: 404 })
     }
 
     return NextResponse.json(recipe)
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to fetch recipe' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to fetch recipe' }, { status: 500 })
   }
 }
 
 // PUT /api/recipes/[id] - 레시피 수정
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
     const body = await request.json()
@@ -75,55 +63,52 @@ export async function PUT(
           create: ingredients.map((ing: any, index: number) => ({
             name: ing.name,
             amount: ing.amount,
-            order: index
-          }))
+            order: index,
+          })),
         },
         steps: {
           create: steps.map((step: string, index: number) => ({
             instruction: step,
-            order: index
-          }))
+            order: index,
+          })),
         },
         tags: {
           create: await Promise.all(
             tags.map(async (tagName: string) => {
               let tag = await prisma.tag.findUnique({
-                where: { name: tagName }
+                where: { name: tagName },
               })
-              
+
               if (!tag) {
                 tag = await prisma.tag.create({
-                  data: { name: tagName }
+                  data: { name: tagName },
                 })
               }
 
               return {
                 tag: {
-                  connect: { id: tag.id }
-                }
+                  connect: { id: tag.id },
+                },
               }
             })
-          )
-        }
+          ),
+        },
       },
       include: {
         ingredients: true,
         steps: true,
         tags: {
           include: {
-            tag: true
-          }
-        }
-      }
+            tag: true,
+          },
+        },
+      },
     })
 
     return NextResponse.json(recipe)
   } catch (error) {
     console.error('Recipe update error:', error)
-    return NextResponse.json(
-      { error: 'Failed to update recipe' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to update recipe' }, { status: 500 })
   }
 }
 
@@ -136,14 +121,11 @@ export async function DELETE(
     const { id } = await params
 
     await prisma.recipe.delete({
-      where: { id }
+      where: { id },
     })
 
     return NextResponse.json({ message: 'Recipe deleted' })
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to delete recipe' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to delete recipe' }, { status: 500 })
   }
 }

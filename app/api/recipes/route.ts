@@ -7,28 +7,25 @@ export async function GET() {
     const recipes = await prisma.recipe.findMany({
       include: {
         ingredients: {
-          orderBy: { order: 'asc' }
+          orderBy: { order: 'asc' },
         },
         steps: {
-          orderBy: { order: 'asc' }
+          orderBy: { order: 'asc' },
         },
         tags: {
           include: {
-            tag: true
-          }
-        }
+            tag: true,
+          },
+        },
       },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: 'desc',
+      },
     })
 
     return NextResponse.json(recipes)
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to fetch recipes' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to fetch recipes' }, { status: 500 })
   }
 }
 
@@ -55,55 +52,52 @@ export async function POST(request: NextRequest) {
           create: ingredients.map((ing: any, index: number) => ({
             name: ing.name,
             amount: ing.amount,
-            order: index
-          }))
+            order: index,
+          })),
         },
         steps: {
           create: steps.map((step: string, index: number) => ({
             instruction: step,
-            order: index
-          }))
+            order: index,
+          })),
         },
         tags: {
           create: await Promise.all(
             tags.map(async (tagName: string) => {
               // 태그가 이미 있으면 찾고, 없으면 생성
               let tag = await prisma.tag.findUnique({
-                where: { name: tagName }
+                where: { name: tagName },
               })
-              
+
               if (!tag) {
                 tag = await prisma.tag.create({
-                  data: { name: tagName }
+                  data: { name: tagName },
                 })
               }
 
               return {
                 tag: {
-                  connect: { id: tag.id }
-                }
+                  connect: { id: tag.id },
+                },
               }
             })
-          )
-        }
+          ),
+        },
       },
       include: {
         ingredients: true,
         steps: true,
         tags: {
           include: {
-            tag: true
-          }
-        }
-      }
+            tag: true,
+          },
+        },
+      },
     })
 
     return NextResponse.json(recipe, { status: 201 })
   } catch (error) {
     console.error('Recipe creation error:', error)
-    return NextResponse.json(
-      { error: 'Failed to create recipe' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to create recipe' }, { status: 500 })
   }
 }

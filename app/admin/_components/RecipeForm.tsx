@@ -23,9 +23,7 @@ export default function RecipeForm({ recipeId }: RecipeFormProps) {
 
   const [title, setTitle] = useState('')
   const [coverImage, setCoverImage] = useState('')
-  const [ingredients, setIngredients] = useState<Ingredient[]>([
-    { name: '', amount: '' }
-  ])
+  const [ingredients, setIngredients] = useState<Ingredient[]>([{ name: '', amount: '' }])
   const [steps, setSteps] = useState<string[]>([''])
   const [tags, setTags] = useState<string[]>([])
   const [tagInput, setTagInput] = useState('')
@@ -35,19 +33,21 @@ export default function RecipeForm({ recipeId }: RecipeFormProps) {
     if (isEditMode && recipeId) {
       setFetching(true)
       fetch(`/api/recipes/${recipeId}`)
-        .then(res => res.json())
-        .then(data => {
+        .then((res) => res.json())
+        .then((data) => {
           setTitle(data.title)
           setCoverImage(data.coverImage || '')
-          setIngredients(data.ingredients.map((ing: any) => ({
-            name: ing.name,
-            amount: ing.amount
-          })))
+          setIngredients(
+            data.ingredients.map((ing: any) => ({
+              name: ing.name,
+              amount: ing.amount,
+            }))
+          )
           setSteps(data.steps.map((step: any) => step.instruction))
           setTags(data.tags.map((rt: any) => rt.tag.name))
           setTip(data.tip || '')
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Failed to fetch recipe:', error)
           alert('레시피를 불러오는데 실패했습니다.')
         })
@@ -91,7 +91,7 @@ export default function RecipeForm({ recipeId }: RecipeFormProps) {
   }
 
   const removeTag = (tag: string) => {
-    setTags(tags.filter(t => t !== tag))
+    setTags(tags.filter((t) => t !== tag))
   }
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,7 +105,7 @@ export default function RecipeForm({ recipeId }: RecipeFormProps) {
         maxSizeMB: 0.3,
         maxWidthOrHeight: 800,
         useWebWorker: true,
-        fileType: 'image/jpeg'
+        fileType: 'image/jpeg',
       }
 
       // 압축
@@ -158,8 +158,8 @@ export default function RecipeForm({ recipeId }: RecipeFormProps) {
         body: JSON.stringify({
           title,
           coverImage: coverImage || null,
-          ingredients: ingredients.filter(ing => ing.name && ing.amount),
-          steps: steps.filter(step => step.trim()),
+          ingredients: ingredients.filter((ing) => ing.name && ing.amount),
+          steps: steps.filter((step) => step.trim()),
           tags,
           tip: tip || null,
         }),
@@ -180,9 +180,7 @@ export default function RecipeForm({ recipeId }: RecipeFormProps) {
   }
 
   if (fetching) {
-    return (
-      <div className="text-center py-12 text-gray-600">로딩 중...</div>
-    )
+    return <div className="text-center py-12 text-gray-600">로딩 중...</div>
   }
 
   return (
@@ -202,7 +200,9 @@ export default function RecipeForm({ recipeId }: RecipeFormProps) {
 
       {/* 대표 이미지 */}
       <div>
-        <label className="block text-sm md:text-base font-medium mb-2 text-gray-900">대표 이미지</label>
+        <label className="block text-sm md:text-base font-medium mb-2 text-gray-900">
+          대표 이미지
+        </label>
 
         <div className="mb-3 md:mb-2">
           <input
@@ -227,11 +227,7 @@ export default function RecipeForm({ recipeId }: RecipeFormProps) {
 
         {coverImage && (
           <div className="mt-3 md:mt-2">
-            <img
-              src={coverImage}
-              alt="미리보기"
-              className="w-full md:w-48 rounded-lg"
-            />
+            <img src={coverImage} alt="미리보기" className="w-full md:w-48 rounded-lg" />
           </div>
         )}
       </div>
@@ -285,7 +281,10 @@ export default function RecipeForm({ recipeId }: RecipeFormProps) {
         <label className="block text-sm md:text-base font-medium mb-2 text-gray-900">재료 *</label>
         <div className="space-y-3 md:space-y-2">
           {ingredients.map((ingredient, index) => (
-            <div key={index} className="bg-gray-50 p-4 md:p-3 rounded-lg space-y-3 md:space-y-0 md:flex md:gap-2 md:items-start border border-gray-200">
+            <div
+              key={index}
+              className="bg-gray-50 p-4 md:p-3 rounded-lg space-y-3 md:space-y-0 md:flex md:gap-2 md:items-start border border-gray-200"
+            >
               <input
                 type="text"
                 value={ingredient.name}
@@ -321,10 +320,15 @@ export default function RecipeForm({ recipeId }: RecipeFormProps) {
 
       {/* 조리 과정 */}
       <div>
-        <label className="block text-sm md:text-base font-medium mb-2 text-gray-900">조리 과정 *</label>
+        <label className="block text-sm md:text-base font-medium mb-2 text-gray-900">
+          조리 과정 *
+        </label>
         <div className="space-y-3 md:space-y-2">
           {steps.map((step, index) => (
-            <div key={index} className="bg-gray-50 p-4 md:p-3 rounded-lg space-y-3 md:space-y-0 md:flex md:gap-2 md:items-start border border-gray-200">
+            <div
+              key={index}
+              className="bg-gray-50 p-4 md:p-3 rounded-lg space-y-3 md:space-y-0 md:flex md:gap-2 md:items-start border border-gray-200"
+            >
               <span className="inline-block md:inline-block px-4 py-2 md:py-2 bg-gray-200 text-gray-900 rounded-lg text-base md:text-sm font-medium min-w-[50px] md:min-w-[40px] text-center">
                 {index + 1}
               </span>
@@ -356,7 +360,9 @@ export default function RecipeForm({ recipeId }: RecipeFormProps) {
 
       {/* 팁 */}
       <div>
-        <label className="block text-sm md:text-base font-medium mb-2 text-gray-900">팁 (선택)</label>
+        <label className="block text-sm md:text-base font-medium mb-2 text-gray-900">
+          팁 (선택)
+        </label>
         <textarea
           value={tip}
           onChange={(e) => setTip(e.target.value)}

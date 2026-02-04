@@ -80,10 +80,7 @@ export default function AdminPage() {
         {recipes.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500 mb-4 text-lg">아직 작성된 레시피가 없습니다.</p>
-            <Link
-              href="/admin/recipe/new"
-              className="text-blue-600 hover:underline text-lg"
-            >
+            <Link href="/admin/recipe/new" className="text-blue-600 hover:underline text-lg">
               첫 레시피를 작성해보세요!
             </Link>
           </div>
@@ -106,12 +103,14 @@ export default function AdminPage() {
                       />
                     </div>
                   )}
-                  
+
                   {/* 내용 */}
                   <div className="flex-1 p-4 md:flex md:items-center md:justify-between">
                     <div className="flex-1">
-                      <h2 className="text-xl font-bold text-gray-900 mb-3 md:mb-2">{recipe.title}</h2>
-                      
+                      <h2 className="text-xl font-bold text-gray-900 mb-3 md:mb-2">
+                        {recipe.title}
+                      </h2>
+
                       {/* 태그 */}
                       {recipe.tags.length > 0 && (
                         <div className="flex flex-wrap gap-2 mb-3 md:mb-2">
