@@ -33,7 +33,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { title, coverImage, tip, ingredients, steps, tags } = body
+    const { title, coverImage, difficulty, category, tip, ingredients, steps, tags } = body
 
     // slug 생성 (간단 버전)
     const slug = title
@@ -47,6 +47,8 @@ export async function POST(request: NextRequest) {
         title,
         slug,
         coverImage,
+        difficulty: difficulty || 3,
+        category: category || null,
         tip,
         ingredients: {
           create: ingredients.map((ing: any, index: number) => ({

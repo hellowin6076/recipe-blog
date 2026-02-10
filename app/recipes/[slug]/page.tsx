@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import Header from '@/components/Header'
+import DisqusComments from '@/components/DisqusComments'
 
 async function getRecipe(slug: string) {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
@@ -36,19 +38,15 @@ export default async function RecipePage({ params }: { params: Promise<{ slug: s
     notFound()
   }
 
+  // Disqus용 URL 생성
+  const recipeUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/recipes/${recipe.slug}`
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* 헤더 */}
-      <header className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-4">
-          <Link href="/" className="text-blue-600 hover:underline">
-            ← 목록으로
-          </Link>
-        </div>
-      </header>
+      <Header />
 
       {/* 메인 */}
-      <main className="max-w-6xl mx-auto px-4 py-8">
+      <main className="max-w-4xl mx-auto px-4 py-8">
         <article className="bg-white rounded-lg shadow-sm p-6 md:p-8">
           {/* 제목 */}
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{recipe.title}</h1>
@@ -138,6 +136,14 @@ export default async function RecipePage({ params }: { params: Promise<{ slug: s
               </div>
             </section>
           )}
+
+          {/* Disqus 댓글 */}
+          <DisqusComments
+            shortname="bufgix-recipe"
+            identifier={recipe.slug}
+            title={recipe.title}
+            url={recipeUrl}
+          />
 
           {/* 최하단 광고 공간 (여백) */}
           <div className="mb-8"></div>

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="heroGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FEF3C7;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FED7AA;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FDBA74;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="400" fill="url(#heroGradient)"/>
+  
+  <!-- Decorative food icons -->
+  <text x="100" y="100" font-size="60" opacity="0.2">🍜</text>
+  <text x="1050" y="320" font-size="80" opacity="0.15">🍲</text>
+  <text x="950" y="80" font-size="50" opacity="0.2">🥘</text>
+  <text x="200" y="340" font-size="45" opacity="0.15">🍳</text>
+  
+  <!-- Main title - DevRecipe -->
+  <text x="600" y="180" font-family="Georgia, serif" font-size="90" font-weight="bold" text-anchor="middle" fill="#1F2937" letter-spacing="2">
+    DevRecipe
+  </text>
+  
+  <!-- Decorative line -->
+  <line x1="380" y1="210" x2="820" y2="210" stroke="#9CA3AF" stroke-width="1" opacity="0.4"/>
+  
+  <!-- Subtitle -->
+  <text x="600" y="270" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="#374151" letter-spacing="2">
+    개발자의 요리 아카이브
+  </text>
+  
+  <!-- Small decorative elements -->
+  <circle cx="410" cy="200" r="4" fill="#F97316"/>
+  <circle cx="790" cy="200" r="4" fill="#F97316"/>
+</svg>

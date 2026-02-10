@@ -13,6 +13,8 @@ model Recipe {
   slug        String       @unique
   coverImage  String?
   tip         String?
+  difficulty  Int          @default(3) // 1-5 (1: 매우 쉬움, 5: 매우 어려움)
+  category    String?      // 예: "국/찌개", "볶음", "무침" 등
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   

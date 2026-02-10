@@ -1,4 +1,6 @@
 import Link from 'next/link'
+import Header from '@/components/Header'
+import PostCard from '@/components/PostCard'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -21,106 +23,90 @@ interface Recipe {
   slug: string
   coverImage: string | null
   createdAt: string
+  difficulty?: number
+  category?: string
   tags: { tag: { name: string } }[]
 }
 
+// Mock data for comments (will be replaced by Disqus)
+const mockStats: { [key: string]: { comments: number } } = {}
+
 export default async function HomePage() {
   const recipes: Recipe[] = await getRecipes()
+  const recentRecipes = recipes.slice(0, 6) // 최신 6개만
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* 헤더 */}
-      <header className="bg-white border-b shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition">
-              <img src="/favicon.ico" alt="로고" className="w-10 h-10" />
-              <h1 className="text-2xl font-bold text-gray-900">레시피 블로그</h1>
-            </Link>
-            <nav className="flex gap-6">
-              <Link
-                href="/"
-                className="text-gray-600 hover:text-gray-900 font-medium transition"
-              >
-                홈
-              </Link>
-              <Link
-                href="/about"
-                className="text-gray-600 hover:text-gray-900 font-medium transition"
-              >
-                소개
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <Header />
 
-      {/* 메인 */}
-      <main className="max-w-6xl mx-auto px-4 py-8">
-        {recipes.length === 0 ? (
+      {/* Hero Section */}
+      <section className="relative h-48 sm:h-64 md:h-80 bg-gradient-to-r from-amber-100 to-orange-100 overflow-hidden">
+        <img 
+          src="/hero.svg" 
+          alt="bufgix recipe blog" 
+          className="w-full h-full object-cover"
+        />
+      </section>
+
+      {/* Recent Posts Section */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12 tracking-wide">
+          RECENT RECIPES
+        </h2>
+        
+        {recentRecipes.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500 text-lg">아직 레시피가 없습니다.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {recipes.map((recipe) => (
-              <Link
-                key={recipe.id}
-                href={`/recipes/${recipe.slug}`}
-                className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
-              >
-                {/* 이미지 */}
-                {recipe.coverImage ? (
-                  <div className="overflow-hidden">
-                    <img
-                      src={recipe.coverImage}
-                      alt={recipe.title}
-                      className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                  </div>
-                ) : (
-                  <div className="w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                    <span className="text-gray-400">이미지 없음</span>
-                  </div>
-                )}
-
-                {/* 내용 */}
-                <div className="p-5">
-                  <h2 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">
-                    {recipe.title}
-                  </h2>
-
-                  {/* 태그 */}
-                  {recipe.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-3">
-                      {recipe.tags.map((rt) => (
-                        <span
-                          key={rt.tag.name}
-                          className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm font-medium"
-                        >
-                          #{rt.tag.name}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* 날짜 */}
-                  <p className="text-sm text-gray-500 flex items-center gap-1">
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path
-                        fillRule="evenodd"
-                        d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    {new Date(recipe.createdAt).toLocaleDateString('ko-KR')}
-                  </p>
-                </div>
-              </Link>
+          <div className="max-w-3xl mx-auto space-y-6 sm:space-y-8">
+            {recentRecipes.map((recipe, index) => (
+              <PostCard 
+                key={recipe.id} 
+                recipe={recipe}
+                comments={mockStats[recipe.id]?.comments || Math.floor(Math.random() * 20)}
+              />
             ))}
           </div>
         )}
-      </main>
+
+        {/* All Posts Button */}
+        {recipes.length > 6 && (
+          <div className="text-center mt-10 sm:mt-12">
+            <Link
+              href="/blog"
+              className="inline-block bg-black text-white px-8 sm:px-10 py-2.5 sm:py-3 hover:bg-gray-800 transition-colors duration-300 font-semibold tracking-wide text-sm sm:text-base"
+            >
+              All Posts
+            </Link>
+          </div>
+        )}
+      </section>
+
+      {/* About Section */}
+      <section className="bg-white py-12 sm:py-16 mt-12 sm:mt-16">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+          <h3 className="text-xl sm:text-2xl font-bold mb-4">ABOUT</h3>
+          <div className="w-16 h-1 bg-black mb-6 mx-auto"></div>
+          <p className="text-gray-600 leading-relaxed mb-6 max-w-xl mx-auto text-sm sm:text-base">
+            오사카에서 한국 레시피를 공유하는 블로그입니다. 
+            집에서 쉽게 따라 할 수 있는 한국 요리와 일본에서의 요리 생활을 담고 있습니다.
+          </p>
+          
+          {/* GitHub Link */}
+          <a 
+            href="https://github.com/hellowin6076" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-gray-700 hover:text-black transition"
+          >
+            <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+            <span className="text-sm sm:text-base">GitHub</span>
+          </a>
+        </div>
+      </section>
     </div>
   )
 }

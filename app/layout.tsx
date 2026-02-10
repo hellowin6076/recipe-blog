@@ -27,7 +27,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" className="light">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>{children}</body>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        {children}
+        {/* Disqus 댓글 수 카운트 스크립트 */}
+        <script id="dsq-count-scr" src="//bufgix-recipe.disqus.com/count.js" async></script>
+      </body>
     </html>
   )
 }

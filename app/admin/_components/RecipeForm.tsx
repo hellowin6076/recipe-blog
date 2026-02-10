@@ -13,6 +13,21 @@ interface RecipeFormProps {
   recipeId?: string
 }
 
+// 카테고리 옵션
+const CATEGORIES = [
+  '국/찌개',
+  '볶음',
+  '무침',
+  '조림',
+  '구이',
+  '튀김',
+  '찜',
+  '전/부침',
+  '밥/죽/면',
+  '디저트',
+  '기타'
+]
+
 export default function RecipeForm({ recipeId }: RecipeFormProps) {
   const router = useRouter()
   const isEditMode = !!recipeId
@@ -23,6 +38,8 @@ export default function RecipeForm({ recipeId }: RecipeFormProps) {
 
   const [title, setTitle] = useState('')
   const [coverImage, setCoverImage] = useState('')
+  const [difficulty, setDifficulty] = useState(3) // 1-5
+  const [category, setCategory] = useState('')
   const [ingredients, setIngredients] = useState<Ingredient[]>([{ name: '', amount: '' }])
   const [steps, setSteps] = useState<string[]>([''])
   const [tags, setTags] = useState<string[]>([])
@@ -37,6 +54,8 @@ export default function RecipeForm({ recipeId }: RecipeFormProps) {
         .then((data) => {
           setTitle(data.title)
           setCoverImage(data.coverImage || '')
+          setDifficulty(data.difficulty || 3)
+          setCategory(data.category || '')
           setIngredients(
             data.ingredients.map((ing: any) => ({
               name: ing.name,
@@ -158,6 +177,8 @@ export default function RecipeForm({ recipeId }: RecipeFormProps) {
         body: JSON.stringify({
           title,
           coverImage: coverImage || null,
+          difficulty,
+          category: category || null,
           ingredients: ingredients.filter((ing) => ing.name && ing.amount),
           steps: steps.filter((step) => step.trim()),
           tags,
@@ -196,6 +217,49 @@ export default function RecipeForm({ recipeId }: RecipeFormProps) {
           className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg text-base md:text-sm text-gray-900"
           placeholder="레시피 제목"
         />
+      </div>
+
+      {/* 난이도 */}
+      <div>
+        <label className="block text-sm md:text-base font-medium mb-2 text-gray-900">
+          난이도 *
+        </label>
+        <div className="flex items-center gap-4">
+          {[1, 2, 3, 4, 5].map((level) => (
+            <button
+              key={level}
+              type="button"
+              onClick={() => setDifficulty(level)}
+              className={`text-3xl transition ${
+                level <= difficulty ? 'opacity-100' : 'opacity-30'
+              } hover:opacity-100`}
+            >
+              ⭐
+            </button>
+          ))}
+          <span className="text-sm text-gray-600 ml-2">
+            ({difficulty === 1 ? '매우 쉬움' : difficulty === 2 ? '쉬움' : difficulty === 3 ? '보통' : difficulty === 4 ? '어려움' : '매우 어려움'})
+          </span>
+        </div>
+      </div>
+
+      {/* 카테고리 */}
+      <div>
+        <label className="block text-sm md:text-base font-medium mb-2 text-gray-900">
+          카테고리
+        </label>
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg text-base md:text-sm text-gray-900"
+        >
+          <option value="">선택 안 함</option>
+          {CATEGORIES.map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* 대표 이미지 */}
