@@ -26,8 +26,7 @@ export default function BlogPage() {
 
   useEffect(() => {
     async function fetchRecipes() {
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
-      const res = await fetch(`${baseUrl}/api/recipes`, { cache: 'no-store' })
+      const res = await fetch('/api/recipes', { cache: 'no-store' })
       if (res.ok) {
         const data = await res.json()
         setRecipes(data)
@@ -36,6 +35,13 @@ export default function BlogPage() {
     }
     fetchRecipes()
   }, [])
+
+  // Disqus 댓글 수 로드
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.DISQUSWIDGETS) {
+      window.DISQUSWIDGETS.getCount({ reset: true })
+    }
+  }, [filteredRecipes])
 
   // 카테고리와 태그 추출
   const categories = Array.from(new Set(recipes.map(r => r.category).filter(Boolean))) as string[]
@@ -164,7 +170,6 @@ export default function BlogPage() {
                   <PostCard 
                     key={recipe.id} 
                     recipe={recipe}
-                    comments={mockStats[recipe.id]?.comments || Math.floor(Math.random() * 20)}
                   />
                 ))}
               </div>

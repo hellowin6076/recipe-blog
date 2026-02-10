@@ -35,3 +35,12 @@ export default function RootLayout({
     </html>
   )
 }
+
+// Disqus 타입 선언
+declare global {
+  interface Window {
+    DISQUSWIDGETS?: {
+      getCount: (options: { reset: boolean }) => void
+    }
+  }
+}

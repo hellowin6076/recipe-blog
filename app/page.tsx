@@ -64,7 +64,6 @@ export default async function HomePage() {
               <PostCard 
                 key={recipe.id} 
                 recipe={recipe}
-                comments={mockStats[recipe.id]?.comments || Math.floor(Math.random() * 20)}
               />
             ))}
           </div>
