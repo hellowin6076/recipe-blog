@@ -38,13 +38,13 @@ export default function RecipeForm({ recipeId }: RecipeFormProps) {
 
   const [title, setTitle] = useState('')
   const [coverImage, setCoverImage] = useState('')
-  const [difficulty, setDifficulty] = useState(3) // 1-5
+  const [rating, setRating] = useState(3) // 1-5
   const [category, setCategory] = useState('')
   const [ingredients, setIngredients] = useState<Ingredient[]>([{ name: '', amount: '' }])
   const [steps, setSteps] = useState<string[]>([''])
   const [tags, setTags] = useState<string[]>([])
   const [tagInput, setTagInput] = useState('')
-  const [tip, setTip] = useState('')
+  const [notes, setNotes] = useState('')
 
   useEffect(() => {
     if (isEditMode && recipeId) {
@@ -54,7 +54,7 @@ export default function RecipeForm({ recipeId }: RecipeFormProps) {
         .then((data) => {
           setTitle(data.title)
           setCoverImage(data.coverImage || '')
-          setDifficulty(data.difficulty || 3)
+          setRating(data.rating || 3)
           setCategory(data.category || '')
           setIngredients(
             data.ingredients.map((ing: any) => ({
@@ -64,7 +64,7 @@ export default function RecipeForm({ recipeId }: RecipeFormProps) {
           )
           setSteps(data.steps.map((step: any) => step.instruction))
           setTags(data.tags.map((rt: any) => rt.tag.name))
-          setTip(data.tip || '')
+          setNotes(data.notes || '')
         })
         .catch((error) => {
           console.error('Failed to fetch recipe:', error)
@@ -119,7 +119,6 @@ export default function RecipeForm({ recipeId }: RecipeFormProps) {
 
     setUploading(true)
     try {
-      // 이미지 압축 옵션
       const options = {
         maxSizeMB: 0.3,
         maxWidthOrHeight: 800,
@@ -127,16 +126,13 @@ export default function RecipeForm({ recipeId }: RecipeFormProps) {
         fileType: 'image/jpeg',
       }
 
-      // 압축
       console.log('원본 크기:', (file.size / 1024 / 1024).toFixed(2), 'MB')
       const compressedFile = await imageCompression(file, options)
       console.log('압축 후 크기:', (compressedFile.size / 1024 / 1024).toFixed(2), 'MB')
 
-      // 업로드
       const formData = new FormData()
       formData.append('file', compressedFile)
 
-      // 기존 이미지 URL 전달 (있으면)
       if (coverImage) {
         formData.append('oldUrl', coverImage)
       }
@@ -177,12 +173,12 @@ export default function RecipeForm({ recipeId }: RecipeFormProps) {
         body: JSON.stringify({
           title,
           coverImage: coverImage || null,
-          difficulty,
+          rating,
           category: category || null,
           ingredients: ingredients.filter((ing) => ing.name && ing.amount),
           steps: steps.filter((step) => step.trim()),
           tags,
-          tip: tip || null,
+          notes: notes || null,
         }),
       })
 
@@ -229,16 +225,16 @@ export default function RecipeForm({ recipeId }: RecipeFormProps) {
             <button
               key={level}
               type="button"
-              onClick={() => setDifficulty(level)}
+              onClick={() => setRating(level)}
               className={`text-3xl transition ${
-                level <= difficulty ? 'opacity-100' : 'opacity-30'
+                level <= rating ? 'opacity-100' : 'opacity-30'
               } hover:opacity-100`}
             >
               ⭐
             </button>
           ))}
           <span className="text-sm text-gray-600 ml-2">
-            ({difficulty === 1 ? '매우 쉬움' : difficulty === 2 ? '쉬움' : difficulty === 3 ? '보통' : difficulty === 4 ? '어려움' : '매우 어려움'})
+            ({rating === 1 ? '매우 쉬움' : rating === 2 ? '쉬움' : rating === 3 ? '보통' : rating === 4 ? '어려움' : '매우 어려움'})
           </span>
         </div>
       </div>
@@ -422,14 +418,14 @@ export default function RecipeForm({ recipeId }: RecipeFormProps) {
         </button>
       </div>
 
-      {/* 팁 */}
+      {/* 메모/팁 */}
       <div>
         <label className="block text-sm md:text-base font-medium mb-2 text-gray-900">
-          팁 (선택)
+          메모/팁 (선택)
         </label>
         <textarea
-          value={tip}
-          onChange={(e) => setTip(e.target.value)}
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
           rows={4}
           className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg text-base md:text-sm text-gray-900"
           placeholder="요리 팁이나 메모"

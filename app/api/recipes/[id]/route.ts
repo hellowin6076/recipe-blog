@@ -38,7 +38,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   try {
     const { id } = await params
     const body = await request.json()
-    const { title, coverImage, difficulty, category, tip, ingredients, steps, tags } = body
+    const { title, coverImage, rating, category, notes, ingredients, steps, tags } = body
 
     // 기존 재료, 스텝 삭제
     await prisma.ingredient.deleteMany({ where: { recipeId: id } })
@@ -58,9 +58,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         title,
         slug,
         coverImage,
-        difficulty: difficulty || 3,
+        rating: rating || 3,
         category: category || null,
-        tip,
+        notes,
         ingredients: {
           create: ingredients.map((ing: any, index: number) => ({
             name: ing.name,
@@ -77,12 +77,12 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         tags: {
           create: await Promise.all(
             tags.map(async (tagName: string) => {
-              let tag = await prisma.tag.findUnique({
+              let tag = await prisma.recipeTagMaster.findUnique({
                 where: { name: tagName },
               })
 
               if (!tag) {
-                tag = await prisma.tag.create({
+                tag = await prisma.recipeTagMaster.create({
                   data: { name: tagName },
                 })
               }

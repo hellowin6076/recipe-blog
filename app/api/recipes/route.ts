@@ -25,6 +25,7 @@ export async function GET() {
 
     return NextResponse.json(recipes)
   } catch (error) {
+    console.error('Failed to fetch recipes:', error)
     return NextResponse.json({ error: 'Failed to fetch recipes' }, { status: 500 })
   }
 }
@@ -33,7 +34,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { title, coverImage, difficulty, category, tip, ingredients, steps, tags } = body
+    const { title, coverImage, rating, category, notes, ingredients, steps, tags } = body
 
     // slug 생성 (간단 버전)
     const slug = title
@@ -47,9 +48,9 @@ export async function POST(request: NextRequest) {
         title,
         slug,
         coverImage,
-        difficulty: difficulty || 3,
+        rating: rating || 3,
         category: category || null,
-        tip,
+        notes,
         ingredients: {
           create: ingredients.map((ing: any, index: number) => ({
             name: ing.name,
@@ -67,12 +68,12 @@ export async function POST(request: NextRequest) {
           create: await Promise.all(
             tags.map(async (tagName: string) => {
               // 태그가 이미 있으면 찾고, 없으면 생성
-              let tag = await prisma.tag.findUnique({
+              let tag = await prisma.recipeTagMaster.findUnique({
                 where: { name: tagName },
               })
 
               if (!tag) {
-                tag = await prisma.tag.create({
+                tag = await prisma.recipeTagMaster.create({
                   data: { name: tagName },
                 })
               }

@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-// GET /api/tags - 태그 목록 (자동완성용)
+// GET /api/tags - 레시피 태그 목록 (자동완성용)
 export async function GET() {
   try {
-    const tags = await prisma.tag.findMany({
+    const tags = await prisma.recipeTagMaster.findMany({
       orderBy: {
         name: 'asc',
       },
