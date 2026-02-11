@@ -1,10 +1,12 @@
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas  = ["recipe"]
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 model Recipe {
@@ -12,8 +14,8 @@ model Recipe {
   title       String
   slug        String       @unique
   coverImage  String?
-  tip         String?
-  difficulty  Int          @default(3) // 1-5 (1: 매우 쉬움, 5: 매우 어려움)
+  notes       String?      // tip → notes로 통일
+  rating      Int          @default(3) // 1-5 (difficulty → rating으로 통일)
   category    String?      // 예: "국/찌개", "볶음", "무침" 등
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
@@ -21,6 +23,8 @@ model Recipe {
   ingredients Ingredient[]
   steps       Step[]
   tags        RecipeTag[]
+  
+  @@schema("recipe")
 }
 
 model Ingredient {
@@ -30,6 +34,8 @@ model Ingredient {
   order    Int    @default(0)
   recipeId String
   recipe   Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  
+  @@schema("recipe")
 }
 
 model Step {
@@ -38,19 +44,25 @@ model Step {
   order       Int
   recipeId    String
   recipe      Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  
+  @@schema("recipe")
 }
 
-model Tag {
+model RecipeTagMaster {
   id      String      @id @default(cuid())
   name    String      @unique
   recipes RecipeTag[]
+  
+  @@map("Tag")
+  @@schema("recipe")
 }
 
 model RecipeTag {
   recipeId String
   tagId    String
-  recipe   Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
-  tag      Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  recipe   Recipe           @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  tag      RecipeTagMaster  @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@id([recipeId, tagId])
+  @@schema("recipe")
 }
