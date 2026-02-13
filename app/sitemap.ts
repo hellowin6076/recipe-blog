@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next'
 import { prisma } from '@/lib/prisma'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://recipe-blog-bufgixs-projects.vercel.app'
+  const baseUrl = 'https://recipe-blog-bufgix.vercel.app'
 
   // 모든 레시피 가져오기
   const recipes = await prisma.recipe.findMany({
