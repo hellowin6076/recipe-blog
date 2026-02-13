@@ -10,19 +10,22 @@ interface Recipe {
   slug: string
   coverImage: string | null
   createdAt: string
-  difficulty?: number
+  rating?: number
   category?: string
   tags: { tag: { name: string } }[]
 }
-
-// Mock data for likes and comments
-const mockStats: { [key: string]: { comments: number } } = {}
 
 export default function BlogPage() {
   const [recipes, setRecipes] = useState<Recipe[]>([])
   const [filteredRecipes, setFilteredRecipes] = useState<Recipe[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [selectedRating, setSelectedRating] = useState<number | null>(null)
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
+  
+  // 필터 섹션 열림/닫힘 상태 (기본값: 닫힘)
+  const [showCategoryFilter, setShowCategoryFilter] = useState(false)
+  const [showRatingFilter, setShowRatingFilter] = useState(false)
+  const [showTagFilter, setShowTagFilter] = useState(false)
 
   useEffect(() => {
     async function fetchRecipes() {
@@ -54,6 +57,11 @@ export default function BlogPage() {
     return recipes.filter(r => r.category === category).length
   }
 
+  // 난이도별 개수
+  const getRatingCount = (rating: number) => {
+    return recipes.filter(r => r.rating && Math.round(r.rating) === rating).length
+  }
+
   // 태그별 개수
   const getTagCount = (tag: string) => {
     return recipes.filter(r => r.tags.some(t => t.tag.name === tag)).length
@@ -67,12 +75,18 @@ export default function BlogPage() {
       filtered = filtered.filter(r => r.category === selectedCategory)
     }
 
+    if (selectedRating) {
+      filtered = filtered.filter(r => r.rating && Math.round(r.rating) === selectedRating)
+    }
+
     if (selectedTag) {
       filtered = filtered.filter(r => r.tags.some(t => t.tag.name === selectedTag))
     }
 
     setFilteredRecipes(filtered)
-  }, [selectedCategory, selectedTag, recipes])
+  }, [selectedCategory, selectedRating, selectedTag, recipes])
+
+  const activeFilterCount = [selectedCategory, selectedRating, selectedTag].filter(Boolean).length
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -87,70 +101,135 @@ export default function BlogPage() {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar */}
           <aside className="lg:w-64 flex-shrink-0">
-            <div className="bg-white rounded-lg shadow-sm p-6 sticky top-20">
-              {/* Categories */}
-              <div className="mb-8">
-                <h3 className="font-bold text-lg mb-4">카테고리</h3>
-                <ul className="space-y-2">
-                  <li>
-                    <button
-                      onClick={() => setSelectedCategory(null)}
-                      className={`w-full text-left px-3 py-2 rounded transition ${
-                        selectedCategory === null
-                          ? 'bg-blue-50 text-blue-600 font-medium'
-                          : 'hover:bg-gray-50'
-                      }`}
-                    >
-                      전체 ({recipes.length})
-                    </button>
-                  </li>
-                  {categories.map(category => (
-                    <li key={category}>
+            <div className="bg-white rounded-lg shadow-sm p-4 lg:p-6 lg:sticky lg:top-20">
+              
+              {/* 카테고리 필터 */}
+              <div className="mb-6">
+                <button
+                  onClick={() => setShowCategoryFilter(!showCategoryFilter)}
+                  className="w-full flex items-center justify-between font-bold text-lg mb-3 text-gray-900"
+                >
+                  <span>카테고리</span>
+                  <span className="text-xl">{showCategoryFilter ? '▲' : '▼'}</span>
+                </button>
+                
+                {showCategoryFilter && (
+                  <ul className="space-y-2">
+                    <li>
                       <button
-                        onClick={() => setSelectedCategory(category)}
+                        onClick={() => setSelectedCategory(null)}
                         className={`w-full text-left px-3 py-2 rounded transition ${
-                          selectedCategory === category
+                          selectedCategory === null
                             ? 'bg-blue-50 text-blue-600 font-medium'
                             : 'hover:bg-gray-50'
                         }`}
                       >
-                        {category} ({getCategoryCount(category)})
+                        전체 ({recipes.length})
                       </button>
                     </li>
-                  ))}
-                </ul>
+                    {categories.map(category => (
+                      <li key={category}>
+                        <button
+                          onClick={() => setSelectedCategory(category)}
+                          className={`w-full text-left px-3 py-2 rounded transition ${
+                            selectedCategory === category
+                              ? 'bg-blue-50 text-blue-600 font-medium'
+                              : 'hover:bg-gray-50'
+                          }`}
+                        >
+                          {category} ({getCategoryCount(category)})
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
 
-              {/* Tags */}
-              <div>
-                <h3 className="font-bold text-lg mb-4">태그</h3>
-                <div className="flex flex-wrap gap-2">
-                  {allTags.map(tag => (
-                    <button
-                      key={tag}
-                      onClick={() => setSelectedTag(selectedTag === tag ? null : tag)}
-                      className={`px-3 py-1 rounded-full text-sm transition ${
-                        selectedTag === tag
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      #{tag} ({getTagCount(tag)})
-                    </button>
-                  ))}
-                </div>
+              {/* 난이도 필터 */}
+              <div className="mb-6 pb-6 border-b border-gray-200">
+                <button
+                  onClick={() => setShowRatingFilter(!showRatingFilter)}
+                  className="w-full flex items-center justify-between font-bold text-lg mb-3 text-gray-900"
+                >
+                  <span>난이도</span>
+                  <span className="text-xl">{showRatingFilter ? '▲' : '▼'}</span>
+                </button>
+                
+                {showRatingFilter && (
+                  <ul className="space-y-2">
+                    <li>
+                      <button
+                        onClick={() => setSelectedRating(null)}
+                        className={`w-full text-left px-3 py-2 rounded transition ${
+                          selectedRating === null
+                            ? 'bg-blue-50 text-blue-600 font-medium'
+                            : 'hover:bg-gray-50'
+                        }`}
+                      >
+                        전체
+                      </button>
+                    </li>
+                    {[1, 2, 3, 4, 5].map(rating => (
+                      <li key={rating}>
+                        <button
+                          onClick={() => setSelectedRating(rating)}
+                          className={`w-full text-left px-3 py-2 rounded transition flex items-center justify-between ${
+                            selectedRating === rating
+                              ? 'bg-blue-50 text-blue-600 font-medium'
+                              : 'hover:bg-gray-50'
+                          }`}
+                        >
+                          <span className="flex items-center gap-2">
+                            <span className="text-yellow-500">{'⭐'.repeat(rating)}</span>
+                          </span>
+                          <span className="text-sm text-gray-500">({getRatingCount(rating)})</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
 
-              {/* Clear Filters */}
-              {(selectedCategory || selectedTag) && (
+              {/* 태그 필터 */}
+              <div className="mb-6">
+                <button
+                  onClick={() => setShowTagFilter(!showTagFilter)}
+                  className="w-full flex items-center justify-between font-bold text-lg mb-3 text-gray-900"
+                >
+                  <span>태그</span>
+                  <span className="text-xl">{showTagFilter ? '▲' : '▼'}</span>
+                </button>
+                
+                {showTagFilter && (
+                  <div className="flex flex-wrap gap-2">
+                    {allTags.map(tag => (
+                      <button
+                        key={tag}
+                        onClick={() => setSelectedTag(selectedTag === tag ? null : tag)}
+                        className={`px-3 py-1 rounded-full text-sm transition ${
+                          selectedTag === tag
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        #{tag} ({getTagCount(tag)})
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* 필터 초기화 */}
+              {activeFilterCount > 0 && (
                 <button
                   onClick={() => {
                     setSelectedCategory(null)
+                    setSelectedRating(null)
                     setSelectedTag(null)
                   }}
-                  className="w-full mt-6 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded text-sm font-medium transition"
+                  className="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded text-sm font-medium transition"
                 >
-                  필터 초기화
+                  필터 초기화 ({activeFilterCount})
                 </button>
               )}
             </div>
