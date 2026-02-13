@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma'
 // PUT: 카테고리 수정
 export async function PUT(
   request: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  context: { params: { id: string } }
 ) {
   try {
     const params = await context.params
@@ -38,7 +38,7 @@ export async function PUT(
 // DELETE: 카테고리 삭제
 export async function DELETE(
   request: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  context: { params: { id: string } }
 ) {
   try {
     const params = await context.params
