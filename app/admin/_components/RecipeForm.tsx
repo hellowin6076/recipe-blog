@@ -13,20 +13,11 @@ interface RecipeFormProps {
   recipeId?: string
 }
 
-// 카테고리 옵션
-const CATEGORIES = [
-  '국/찌개',
-  '볶음',
-  '무침',
-  '조림',
-  '구이',
-  '튀김',
-  '찜',
-  '전/부침',
-  '밥/죽/면',
-  '디저트',
-  '기타'
-]
+interface Category {
+  id: string
+  name: string
+  order: number
+}
 
 export default function RecipeForm({ recipeId }: RecipeFormProps) {
   const router = useRouter()
@@ -35,6 +26,10 @@ export default function RecipeForm({ recipeId }: RecipeFormProps) {
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(false)
   const [uploading, setUploading] = useState(false)
+  
+  // 동적 카테고리
+  const [categories, setCategories] = useState<Category[]>([])
+  const [loadingCategories, setLoadingCategories] = useState(true)
 
   const [title, setTitle] = useState('')
   const [coverImage, setCoverImage] = useState('')
@@ -45,6 +40,28 @@ export default function RecipeForm({ recipeId }: RecipeFormProps) {
   const [tags, setTags] = useState<string[]>([])
   const [tagInput, setTagInput] = useState('')
   const [notes, setNotes] = useState('')
+
+  // 카테고리 불러오기
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch('/api/categories')
+        const data = await res.json()
+        setCategories(data)
+        
+        // 첫 카테고리를 기본값으로 설정 (새 작성 시)
+        if (!isEditMode && data.length > 0) {
+          setCategory(data[0].name)
+        }
+      } catch (error) {
+        console.error('Failed to fetch categories:', error)
+      } finally {
+        setLoadingCategories(false)
+      }
+    }
+    
+    fetchCategories()
+  }, [isEditMode])
 
   useEffect(() => {
     if (isEditMode && recipeId) {
@@ -247,14 +264,19 @@ export default function RecipeForm({ recipeId }: RecipeFormProps) {
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg text-base md:text-sm text-gray-900"
+          disabled={loadingCategories}
+          className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg text-base md:text-sm text-gray-900 disabled:bg-gray-100"
         >
           <option value="">선택 안 함</option>
-          {CATEGORIES.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
+          {loadingCategories ? (
+            <option>로딩 중...</option>
+          ) : (
+            categories.map((cat) => (
+              <option key={cat.id} value={cat.name}>
+                {cat.name}
+              </option>
+            ))
+          )}
         </select>
       </div>
 

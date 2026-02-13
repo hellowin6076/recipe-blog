@@ -66,3 +66,12 @@ model RecipeTag {
   @@id([recipeId, tagId])
   @@schema("recipe")
 }
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  order     Int      @default(0) // 정렬 순서
+  createdAt DateTime @default(now())
+  
+  @@schema("recipe")
+}

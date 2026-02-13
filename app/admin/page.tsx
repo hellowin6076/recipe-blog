@@ -68,12 +68,20 @@ export default function AdminPage() {
         {/* 헤더 */}
         <div className="mb-6">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">레시피 관리</h1>
-          <Link
-            href="/admin/recipe/new"
-            className="block md:inline-block w-full md:w-auto px-6 py-4 md:py-3 bg-blue-600 text-white text-center rounded-xl md:rounded-lg text-lg md:text-base font-bold hover:bg-blue-700"
-          >
-            + 새 레시피 작성
-          </Link>
+          <div className="flex flex-col md:flex-row gap-3">
+            <Link
+              href="/admin/recipe/new"
+              className="block w-full md:w-auto px-6 py-4 md:py-3 bg-blue-600 text-white text-center rounded-xl md:rounded-lg text-lg md:text-base font-bold hover:bg-blue-700"
+            >
+              + 새 레시피 작성
+            </Link>
+            <Link
+              href="/admin/categories"
+              className="block w-full md:w-auto px-6 py-4 md:py-3 border-2 border-orange-600 text-orange-600 text-center rounded-xl md:rounded-lg text-lg md:text-base font-bold hover:bg-orange-50"
+            >
+              카테고리 관리
+            </Link>
+          </div>
         </div>
 
         {/* 레시피 목록 */}
